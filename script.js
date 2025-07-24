@@ -1,144 +1,234 @@
 /**
- * Cleans a string by converting to lowercase and removing non-alphanumeric characters.
- * @param {string} str The input string.
- * @returns {string} The cleaned string.
+ * 🎨 MODERN PALINDROME EXPLORER WITH FLASHY EFFECTS
+ * Enhanced JavaScript with debouncing, loading states, and animations
  */
+
+// Your existing functions (kept the same for compatibility)
 function cleanString(str) {
     if (typeof str !== 'string') {
-        return ''; // Handle non-string inputs gracefully
+        return '';
     }
     return str.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-/**
- * Recursively checks if a string is a palindrome after cleaning.
- * @param {string} originalStr The original input string.
- * @returns {boolean} True if the cleaned string is a palindrome, false otherwise.
- */
 function isPalindromeRecursive(originalStr) {
     const cleaned = cleanString(originalStr);
-
-    // Base Case 1: An empty string or a single character string is a palindrome.
+    
     if (cleaned.length <= 1) {
         return true;
     }
-
-    // Recursive Step: Compare the first and last characters.
-    // If they match, recurse on the substring excluding the first and last characters.
+    
     if (cleaned[0] === cleaned[cleaned.length - 1]) {
-        // cleaned.substring(1, cleaned.length - 1) gets the string without its first and last chars.
         return isPalindromeRecursive(cleaned.substring(1, cleaned.length - 1));
     } else {
-        // If the first and last characters don't match, it's not a palindrome.
         return false;
     }
 }
 
-/**
- * Finds all unique palindromic substrings within an original string.
- * Uses an "expand around center" strategy with a recursive helper.
- * @param {string} originalStr The input string to search within.
- * @returns {string[]} An array of unique palindromic substrings.
- */
 function findAllPalindromicSubstringsRecursive(originalStr) {
-    // Use a Set to store unique palindromes to avoid duplicates automatically.
     const foundPalindromes = new Set();
-    const s = originalStr; // Use 's' for brevity in the helper function
+    const s = originalStr;
 
-    /**
-     * Recursively expands outwards from a center point to find palindromes.
-     * @param {number} left The left pointer.
-     * @param {number} right The right pointer.
-     */
     function expandAroundCenter(left, right) {
-        // Base Case: Stop if pointers are out of bounds or characters don't match.
-        // Also, ensure characters are alphanumeric before comparison if not already pre-cleaned.
-        // For simplicity here, we'll expand on the raw string and then clean the substring.
         if (left < 0 || right >= s.length || s[left].toLowerCase() !== s[right].toLowerCase()) {
             return;
         }
 
-        // Check if the current substring (from left to right) is a palindrome after cleaning
-        // This is important because the original string might have non-alphanumeric chars
-        // that we need to ignore for the actual palindrome check.
         const currentSubstring = s.substring(left, right + 1);
         if (cleanString(currentSubstring).length > 0 && isPalindromeRecursive(currentSubstring)) {
              foundPalindromes.add(currentSubstring);
         }
 
-        // Recursive Step: Expand outwards
         expandAroundCenter(left - 1, right + 1);
     }
 
-    // Iterate through each character as a potential center for odd-length palindromes (e.g., "aba")
     for (let i = 0; i < s.length; i++) {
-        expandAroundCenter(i, i); // Single character as center
+        expandAroundCenter(i, i);
     }
 
-    // Iterate through each space between characters as a potential center for even-length palindromes (e.g., "abba")
     for (let i = 0; i < s.length - 1; i++) {
-        expandAroundCenter(i, i + 1); // Two characters as center
+        expandAroundCenter(i, i + 1);
     }
 
-    // Convert the Set to an Array for the final output.
     return Array.from(foundPalindromes);
 }
 
-// Get references to DOM elements
+// 🎯 Modern DOM elements
 const textInput = document.getElementById('textInput');
 const isPalindromeResult = document.getElementById('isPalindromeResult');
 const substringsOutput = document.getElementById('substringsOutput');
+const resultsContainer = document.getElementById('resultsContainer');
+const emptyState = document.getElementById('emptyState');
+const loadingSpinner = document.getElementById('loadingSpinner');
+
+// 🕒 Debouncing variables
+let typingTimer;
+let isTyping = false;
+const TYPING_DELAY = 300; // milliseconds
 
 /**
- * Updates the UI based on the input text.
+ * 🎪 Enhanced UI update function with animations and loading states
  */
 function updateUI() {
     const inputText = textInput.value;
 
-    // --- Part 1: Check if the full input is a palindrome ---
-    if (inputText.trim() === '') {
-        isPalindromeResult.textContent = 'Type something to check...';
-        isPalindromeResult.className = 'result-text'; // Reset class
+    // Handle loading spinner
+    if (isTyping && inputText.trim()) {
+        loadingSpinner.classList.add('show');
     } else {
-        const isPal = isPalindromeRecursive(inputText);
-        isPalindromeResult.textContent = isPal ? 'YES, it is a palindrome!' : 'NO, it is not a palindrome.';
-        isPalindromeResult.className = `result-text ${isPal ? 'result-true' : 'result-false'}`;
+        loadingSpinner.classList.remove('show');
     }
 
-
-    // --- Part 2: Find and display all palindromic substrings ---
-    substringsOutput.innerHTML = ''; // Clear previous results
-
+    // Handle empty input
     if (inputText.trim() === '') {
-        const p = document.createElement('p');
-        p.className = 'no-results';
-        p.textContent = 'Type something to see results...';
-        substringsOutput.appendChild(p);
+        resultsContainer.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    // Show results, hide empty state
+    resultsContainer.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    // 🎯 Part 1: Check if the full input is a palindrome
+    const isPal = isPalindromeRecursive(inputText);
+    isPalindromeResult.textContent = isPal ? '✨ YES! It\'s a palindrome!' : '❌ No, it\'s not a palindrome';
+    isPalindromeResult.className = `result-text ${isPal ? 'result-true' : 'result-false'}`;
+
+    // 🎨 Part 2: Find and display all palindromic substrings
+    substringsOutput.innerHTML = '';
+    const foundSubs = findAllPalindromicSubstringsRecursive(inputText);
+
+    if (foundSubs.length === 0) {
+        const noResultsDiv = document.createElement('div');
+        noResultsDiv.className = 'no-results';
+        noResultsDiv.textContent = 'No palindromic substrings found.';
+        substringsOutput.appendChild(noResultsDiv);
     } else {
-        const foundSubs = findAllPalindromicSubstringsRecursive(inputText);
+        // Sort palindromes for consistent display
+        foundSubs.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
-        if (foundSubs.length === 0) {
-            const p = document.createElement('p');
-            p.className = 'no-results';
-            p.textContent = 'No palindromic substrings found.';
-            substringsOutput.appendChild(p);
-        } else {
-            // Sort them for consistent display
-            foundSubs.sort((a, b) => a.length - b.length || a.localeCompare(b));
-
-            foundSubs.forEach(sub => {
-                const span = document.createElement('span');
-                span.className = 'palindrome-item';
-                span.textContent = sub;
-                substringsOutput.appendChild(span);
+        // Create palindrome items with staggered animations
+        foundSubs.forEach((sub, index) => {
+            const span = document.createElement('span');
+            span.className = 'palindrome-item';
+            span.textContent = sub;
+            
+            // Add staggered animation delay
+            span.style.animationDelay = `${index * 0.1}s`;
+            
+            // Add hover effect for fun
+            span.addEventListener('mouseenter', function() {
+                this.classList.add('glow');
             });
-        }
+            
+            span.addEventListener('mouseleave', function() {
+                this.classList.remove('glow');
+            });
+            
+            substringsOutput.appendChild(span);
+        });
     }
 }
 
-// Add an event listener to the input field
-// The 'input' event fires whenever the value of an <input> or <textarea> element has been changed.
-textInput.addEventListener('input', updateUI);
+/**
+ * 🎭 Enhanced input handler with debouncing
+ */
+function handleInput() {
+    isTyping = true;
+    clearTimeout(typingTimer);
+    
+    // Show immediate feedback
+    loadingSpinner.classList.add('show');
+    
+    // Debounce the actual processing
+    typingTimer = setTimeout(() => {
+        isTyping = false;
+        updateUI();
+    }, TYPING_DELAY);
+}
 
-// Initial UI update when the page loads
-updateUI();
+/**
+ * 🎪 Add some extra flair - pulse effect on focus
+ */
+function handleFocus() {
+    textInput.style.transform = 'translateY(-2px) scale(1.02)';
+    textInput.style.boxShadow = '0 0 30px rgba(244, 114, 182, 0.3)';
+}
+
+function handleBlur() {
+    textInput.style.transform = 'translateY(0) scale(1)';
+    textInput.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+}
+
+/**
+ * 🎯 Event listeners
+ */
+textInput.addEventListener('input', handleInput);
+textInput.addEventListener('focus', handleFocus);
+textInput.addEventListener('blur', handleBlur);
+
+/**
+ * 🚀 Initialize the app
+ */
+function initializeApp() {
+    // Initial UI update
+    updateUI();
+    
+    // Add some startup animation
+    setTimeout(() => {
+        document.querySelector('.container').style.animation = 'fadeIn 1s ease-out';
+    }, 100);
+    
+    // Fun Easter egg - double click the title for a surprise!
+    document.querySelector('h1').addEventListener('dblclick', function() {
+        this.style.animation = 'none';
+        setTimeout(() => {
+            this.style.animation = 'gradient 3s ease infinite, pulse 2s ease-in-out infinite';
+        }, 100);
+        
+        // Create some temporary sparkles
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                createSparkle();
+            }, i * 100);
+        }
+    });
+}
+
+/**
+ * ✨ Fun sparkle effect for Easter egg
+ */
+function createSparkle() {
+    const sparkle = document.createElement('div');
+    sparkle.innerHTML = '✨';
+    sparkle.style.position = 'absolute';
+    sparkle.style.fontSize = '2rem';
+    sparkle.style.pointerEvents = 'none';
+    sparkle.style.zIndex = '1000';
+    sparkle.style.left = Math.random() * window.innerWidth + 'px';
+    sparkle.style.top = Math.random() * window.innerHeight + 'px';
+    sparkle.style.animation = 'fadeIn 0.5s ease-out, float 2s ease-in-out';
+    
+    document.body.appendChild(sparkle);
+    
+    setTimeout(() => {
+        sparkle.remove();
+    }, 2000);
+}
+
+/**
+ * 🎬 Start the show!
+ */
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// 🎪 Additional performance optimization
+// Throttle resize events if needed
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        // Any resize-specific code would go here
+        console.log('Window resized - app still looking flashy! 🎨');
+    }, 250);
+});

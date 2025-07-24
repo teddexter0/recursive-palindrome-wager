@@ -7,23 +7,38 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 🌟 Animated Background Blobs -->
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-blob bg-blob-3"></div>
+
     <div class="container">
-        <h1>Recursive Palindrome Explorer</h1>
+        <h1>Palindrome Explorer</h1>
+        <p class="subtitle">Discover the beauty of words that read the same forwards and backwards</p>
 
-        <p>Enter text to check for palindromes and find all palindromic substrings.</p>
-
-        <input type="text" id="textInput" placeholder="Type here...">
-
-        <div class="results-section">
-            <h2>Is it a Palindrome?</h2>
-            <p id="isPalindromeResult" class="result-text"></p>
+        <div class="input-container">
+            <input type="text" id="textInput" placeholder="Enter your text here...">
+            <div class="loading-spinner" id="loadingSpinner"></div>
         </div>
 
-        <div class="results-section">
-            <h2>Found Palindromic Substrings:</h2>
-            <div id="substringsOutput" class="substrings-grid">
-                <p class="no-results">Type something to see results...</p>
+        <!-- Results Container -->
+        <div id="resultsContainer" class="results-container hidden">
+            <div class="results-section">
+                <h2>Is it a Palindrome?</h2>
+                <p id="isPalindromeResult" class="result-text"></p>
             </div>
+
+            <div class="results-section">
+                <h2>Found Palindromic Substrings</h2>
+                <div id="substringsOutput" class="substrings-grid">
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+            <span class="emoji">🔤</span>
+            <p>Start typing to explore palindromes...</p>
         </div>
     </div>
 
