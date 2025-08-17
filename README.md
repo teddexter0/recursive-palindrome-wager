@@ -13,6 +13,18 @@
 
 </div>
 
+
+## 📷 Images
+
+<div align="center">
+
+| Name | Description |
+| --- | --- |
+| ![Screenshot 1](assets/screenshot.png) | The home page of the application. |
+| ![Screenshot 2](assets/screenshotTwo.png) | The results page after entering a string. | 
+
+</div>
+
 ---
 
 ## 📋 Table of Contents
